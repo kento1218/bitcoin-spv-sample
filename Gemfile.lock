@@ -1,0 +1,62 @@
+GIT
+  remote: https://github.com/kento1218/bitcoin-ruby.git
+  revision: be4212f631b71b82f4fe9d8969b8169ac51e1222
+  branch: bip37
+  specs:
+    bitcoin-ruby (0.0.10)
+
+GEM
+  remote: https://rubygems.org/
+  specs:
+    activemodel (5.0.1)
+      activesupport (= 5.0.1)
+    activerecord (5.0.1)
+      activemodel (= 5.0.1)
+      activesupport (= 5.0.1)
+      arel (~> 7.0)
+    activerecord-import (0.17.1)
+      activerecord (>= 3.2)
+    activesupport (5.0.1)
+      concurrent-ruby (~> 1.0, >= 1.0.2)
+      i18n (~> 0.7)
+      minitest (~> 5.1)
+      tzinfo (~> 1.1)
+    arel (7.1.4)
+    byebug (9.0.6)
+    coderay (1.1.1)
+    concurrent-ruby (1.0.5)
+    ffi (1.9.17)
+    i18n (0.8.1)
+    method_source (0.8.2)
+    minitest (5.10.1)
+    pg (0.19.0)
+    pry (0.10.4)
+      coderay (~> 1.1.0)
+      method_source (~> 0.8.1)
+      slop (~> 3.4)
+    pry-byebug (3.4.2)
+      byebug (~> 9.0)
+      pry (~> 0.10)
+    rake (12.0.0)
+    slop (3.6.0)
+    thread_safe (0.3.6)
+    tzinfo (1.2.2)
+      thread_safe (~> 0.1)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  activerecord
+  activerecord-import
+  activesupport
+  bitcoin-ruby!
+  concurrent-ruby
+  ffi
+  pg
+  pry
+  pry-byebug
+  rake
+
+BUNDLED WITH
+   1.13.7
