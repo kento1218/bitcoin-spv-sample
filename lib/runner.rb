@@ -1,3 +1,5 @@
+require 'resolv'
+
 SOCKET_IO_ERRORS = [IOError, Errno::EBADF, Errno::ECONNRESET, Errno::ETIMEDOUT, Errno::EPIPE, Errno::ENETUNREACH, Errno::ECONNREFUSED]
 INIT_NODES = 5
 
