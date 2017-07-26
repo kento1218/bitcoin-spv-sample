@@ -21,6 +21,8 @@ class Block < ::ApplicationRecord
       b.timestamp = Time.at(block.time)
       b.bits = block.bits
       b.version = block.ver
+      b.nonce = block.nonce
+      b.merkle_root = block.mrkl_root.reverse_hth
     end
     block.tx_hashes.each do |tx_hash|
       BlockTransaction.find_or_create_by(block_hash: block.hash, tx_hash: tx_hash)

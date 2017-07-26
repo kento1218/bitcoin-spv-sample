@@ -62,7 +62,8 @@ task load_blocks: :environment do
         b.parse_data(g.read(80))
 
         blk =  Block.new(block_hash: b.hash, prev_hash: b.prev_block_hex,
-          timestamp: Time.at(b.time), bits: b.bits, version: b.ver)
+          timestamp: Time.at(b.time), bits: b.bits, version: b.ver,
+          merkle_root: b.mrkl_root.reverse_hth, nonce: b.nonce)
 
         if prev_hash == blk.prev_hash
           height += 1
