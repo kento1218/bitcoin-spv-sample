@@ -87,6 +87,15 @@ task load_blocks: :environment do
 
 end
 
+task dump_blocks: :environment do
+  Zlib::GzipWriter.open(ENV['DATAFILE']) do |g|
+    Block.best_chain.order(:height).pluck(:version, :prev_hash, :merkle_root,
+      :timestamp, :bits, :nonce).each do |v, p, m, t, b, n|
+      g.write [v, p.htb_reverse, m.htb_reverse, t.to_i, b, n].pack("Va32a32VVV")
+    end
+  end
+end
+
 namespace :db do
   desc 'migrate schema'
   task migrate: :environment do
