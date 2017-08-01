@@ -26,7 +26,6 @@ class ConnectionDealer
   end
 
   def prepare_nodes
-    @nodes.reject!{|n| n.status == :closed }
     @nodes.each do |node|
       if node.status == :created
         node.connect
@@ -34,6 +33,7 @@ class ConnectionDealer
         node.verify_connection
       end
     end
+    @nodes.reject!{|n| n.status == :closed }
   end
 
   def start
