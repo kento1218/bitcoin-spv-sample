@@ -17,7 +17,7 @@ class Node
 
   def send(payload)
     @send_queue.post do
-      return if %i(created closed).include?(@status)
+      return unless connected?
       begin
         @socket.send(payload, 0)
       rescue *SOCKET_IO_ERRORS
@@ -27,7 +27,7 @@ class Node
   end
 
   def receive
-    return if %i(created closed).include?(@status)
+    return unless connected?
     loop do
       buf = @socket.recv_nonblock(BUFFER_SIZE)
       @parser.parse(buf)
@@ -39,23 +39,29 @@ class Node
   end
 
   def connect
-    return unless %i(created closed).include?(@status)
+    return if connected? || connecting?
 
-    @socket = TCPSocket.open(@host, @port)
-    @status = :connected
-    logger.info "[#{@socket.fileno}] connected #{@host}:#{@port}"
+    @status = :connecting
+    Concurrent::Future.execute do
+      begin
+        @socket = TCPSocket.open(@host, @port)
+        @status = :connected
+        logger.info "[#{@socket.fileno}] connected #{@host}:#{@port}"
 
-    block = Block.latest_block.height
-    ver = Bitcoin::P::Version.new(
-      from: "127.0.0.1:8333", from_id: rand(0xffffffffffffffff),
-      to: "#{@host}:#{@port}", block: block, relay: false, services: 0)
-    send(ver.to_pkt)
-  rescue *SOCKET_IO_ERRORS
-    @status = :closed
+        block = Block.latest_block.height
+        ver = Bitcoin::P::Version.new(
+          from: "127.0.0.1:8333", from_id: rand(0xffffffffffffffff),
+          to: "#{@host}:#{@port}", block: block, relay: false, services: 0)
+        send(ver.to_pkt)
+      rescue *SOCKET_IO_ERRORS
+        @status = :closed
+      end
+    end
   end
 
   def disconnect
-    return if %i(created closed).include?(@status)
+    return unless connected?
+    # TODO connecting?
     fileno = @socket.fileno
 
     if @socket && !@socket.closed?
@@ -69,7 +75,7 @@ class Node
   end
 
   def verify_connection
-    return if %i(created closed).include?(@status)
+    return unless connected?
     @socket.send("", 0)
   rescue *SOCKET_IO_ERRORS
     @status = :closed
@@ -222,5 +228,21 @@ class Node
 
   def on_error(*error)
     logger.info "[#{@socket.fileno}] on error #{error}"
+  end
+
+  def connected?
+    @status == :connected || @status == :active
+  end
+  def connecting?
+    @status == :connecting
+  end
+  def closed?
+    @status == :closed
+  end
+  def active?
+    @status == :active
+  end
+  def created?
+    @status == :created
   end
 end

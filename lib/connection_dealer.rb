@@ -30,13 +30,13 @@ class ConnectionDealer
 
   def prepare_nodes
     @nodes.each do |node|
-      if node.status == :created
+      if node.created?
         node.connect
       else
         node.verify_connection
       end
     end
-    @nodes.reject!{|n| n.status == :closed }
+    @nodes.reject!{|n| n.closed? }
   end
 
   def start
@@ -48,7 +48,7 @@ class ConnectionDealer
         prepare_nodes
 
         socks = {}
-        @nodes.each{|n| socks[n.socket] = n }
+        @nodes.select{|n| n.connected? }.each{|n| socks[n.socket] = n }
 
         begin
           selected = IO.select(socks.keys, nil, nil, SELECT_TIMEOUT)
@@ -107,7 +107,7 @@ class ConnectionDealer
   end
 
   def active_nodes
-    @nodes.select{|n| n.status == :active }
+    @nodes.select{|n| n.active? }
   end
 
   def all_active_node
