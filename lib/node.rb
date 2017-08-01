@@ -1,6 +1,7 @@
 class Node
   attr_reader :socket
   attr_reader :status
+  attr_reader :host, :port
 
   BUFFER_SIZE = 2_000
 
@@ -8,8 +9,8 @@ class Node
     @logger ||= Logger.new("log/#{app_env}.log")
   end
 
-  def initialize(host, port, send_queue)
-    @host, @port, @send_queue = host, port, send_queue
+  def initialize(host, port, send_queue, dealer)
+    @host, @port, @send_queue, @dealer = host, port, send_queue, dealer
     @status = :created
     @parser = Bitcoin::P::Parser.new(self)
   end
@@ -208,6 +209,7 @@ class Node
 
   def on_addr(addr)
     logger.info "[#{@socket.fileno}] on addr #{addr.ip}"
+    @dealer.add_node addr.ip, Bitcoin.network[:default_port] if @dealer
   end
 
   def on_pong(nonce)

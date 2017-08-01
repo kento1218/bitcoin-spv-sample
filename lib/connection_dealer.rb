@@ -3,6 +3,7 @@ class ConnectionDealer
   SELECT_TIMEOUT = 3
   BLOCK_CHECK_INTERVAL = 3
   PING_INTERVAL = 60
+  MAX_ACTIVE_NODE = 5
 
   def initialize
     @nodes = Concurrent::Array.new
@@ -11,7 +12,9 @@ class ConnectionDealer
   end
 
   def add_node(host, port)
-    @nodes << Node.new(host, port, @send_queue)
+    return if active_nodes.size >= MAX_ACTIVE_NODE
+    return if @nodes.any?{|n| n.host == host && n.port == port }
+    @nodes << Node.new(host, port, @send_queue, self)
   end
 
   def stop
