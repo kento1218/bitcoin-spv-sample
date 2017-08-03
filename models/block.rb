@@ -12,7 +12,7 @@ class Block < ::ApplicationRecord
   end
 
   def self.latest_block
-    where.not(height: nil).order(:height).last
+    where(validated: true).where.not(height: nil).order(:height).last
   end
 
   def self.create_by_block(block)

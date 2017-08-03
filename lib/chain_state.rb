@@ -1,4 +1,6 @@
 class ChainState
+  BCASH_GENESIS_HASH = '000000000000000000651ef99cb9fcbe0dadde1d424bd9f15ff20136191a5eec'
+
   attr_accessor :updated_at
 
   def initialize
@@ -17,7 +19,8 @@ class ChainState
     pendings = Set.new
     seeds = Set.new
 
-    Block.where(height: nil).pluck(:block_hash, :prev_hash).each do |h, prev|
+    target = Block.where(height: nil).or(Block.where(validated: nil))
+    target.pluck(:block_hash, :prev_hash).each do |h, prev|
       pendings << h
       seeds << prev
     end
@@ -33,11 +36,17 @@ class ChainState
       next if parent.blank? || parent.height.blank?
 
       parent.next_blocks.each do |blk|
-        next if blk.height.present?
-
         # TODO: check blk.bits to ensure valid difficulty
 
-        blk.update(height: parent.height + 1)
+        if !parent.validated
+          validated = false
+        elsif (Bitcoin.network_name == :bitcoin && blk.block_hash == BCASH_GENESIS_HASH)
+          validated = false
+        else
+          validated = true
+        end
+
+        blk.update(height: parent.height + 1, validated: validated)
         seeds << blk
       end
     end
