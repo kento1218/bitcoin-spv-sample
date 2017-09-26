@@ -18,6 +18,7 @@ SPVノードのサンプル的な実装です。以下のことができます�
 ## Setup
 ```
 $ git clone https://github.com/kento1218/bitcoin-spv-sample.git
+$ cd bitcoin-spv-sample
 $ bundle install
 $ createdb spvsample_development
 $ bundle exec rake db:migrate
